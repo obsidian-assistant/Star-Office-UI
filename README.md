@@ -141,15 +141,22 @@ python3 set_state.py idle "待命中"
 
 请在二次发布/演示时保留来源说明，并遵守原作者许可条款。
 
-### 其他资产来源
+### 其他资产说明与免责（重要）
 
-- 主角色动画与办公室场景：由本项目作者团队自行制作。
+- **主角色（宝石海星）与谐音说明**：
+  - “宝石海星”是任天堂《宝可梦》（Pokémon）系列中已有的角色 IP，**不是本项目原创 IP**。
+  - 本项目仅为**非商用二创/粉丝创作**：选择这个角色，是因为“宝石海星”与作者名字“海辛”在中文发音上有谐音趣味。
+  - 本项目的二创内容仅供学习、演示、交流使用，**无任何商业用途**。
+  - 任天堂、宝可梦、“宝石海星”均为任天堂/宝可梦公司的商标或注册商标。
+  - 若你计划使用本项目相关内容，请自行评估合规风险，并优先使用你自己的原创角色/美术资产。
+
+- **办公室场景与其他素材**：由本项目作者团队自行制作。
 
 ### 商用限制（重要）
 
 - 代码玩法可以基于 MIT 使用与二次开发。
-- **本仓库美术资产（含主角色/场景/素材整包）禁止商用。**
-- 若你要做商用，请务必制作并替换成你自己的美术资产。
+- **本仓库所有美术资产（含主角色/场景/素材整包）禁止商用。**
+- 若你要做商用，请务必制作并替换成你自己的原创美术资产。
 
 ---
 
@@ -357,15 +364,22 @@ Guest character animations use LimeZu’s free assets:
 
 Please keep the source attribution and follow the original author’s license terms when redistributing / demonstrating.
 
-### Other asset sources
+### Other asset notes & disclaimer (Important)
 
-- Main character animations and office scene: created by the project author team.
+- **Main character (Starmie) & homophone note:**
+  - “Starmie” is an existing character IP from Nintendo/Pokémon, **not original to this project**.
+  - This project is **non-commercial fan creation only**: this character was chosen because of a fun homophone between “Starmie” and the author’s Chinese name “海辛” (Hǎi Xīn).
+  - All fan-created content in this project is for **learning, demonstration, and idea sharing only, with no commercial use**.
+  - Nintendo, Pokémon, and “Starmie” are trademarks or registered trademarks of Nintendo/The Pokémon Company.
+  - If you plan to use any content related to this project, please assess compliance risks on your own and prioritize using your own original characters/art assets.
+
+- **Office scene & other assets:** created by the project author team.
 
 ### Commercial restriction (Important)
 
 - Code/logic may be used and modified under MIT.
-- **Art assets in this repo (including main characters / scenes / full pack) are NOT for commercial use.**
-- If you want to use this commercially, please create and replace with your own art assets.
+- **All art assets in this repo (including main character / scene / full pack) are NOT for commercial use.**
+- If you want to use this commercially, please create and replace with your own original art assets.
 
 ---
 

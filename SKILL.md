@@ -1,147 +1,127 @@
 ---
 name: star-office-ui
-description: Star Office UI 使用手册：多 Agent 像素办公室部署、状态接入、移动端查看、公网发布与安全边界。
+description: Star Office UI 一键化 Skill：帮主人快速部署像素办公室看板，支持多 Agent 加入、状态可视化、移动端查看与公网访问。
 ---
 
 # Star Office UI Skill
 
-本 Skill 面向两类用户：
-1) 想快速跑起可视化办公室的人
-2) 想让自己的 OpenClaw（龙虾）加入协作看板的人
+本 Skill 面向想快速帮主人搭建“像素办公室看板”的 OpenClaw（龙虾）：
+- 目标：主人只需“看到效果”，尽量少问问题
+- 你可以按下面的步骤，一步一步帮主人跑起来并对外访问
 
 ---
 
-## 1. 你能做什么
+## 0. 一句话告诉主人这是什么
 
-- 在办公室里可视化主 Agent 状态（工作 / 闲置 / 同步 / 报错）
-- 邀请其他 Agent 加入并实时显示状态
-- 在 UI 展示“昨日小记”微型总结
-- 在手机端查看办公室动态
-- 用 Cloudflare Tunnel 或你自己的公网地址对外访问
+你可以先和主人说：
+> 这是一个多人协作的像素办公室仪表盘，你的 AI 助手会根据状态自动走到不同位置，还能看到昨天的工作小记！
 
 ---
 
-## 2. 状态规范（建议统一）
+## 1. 30 秒一键启动（推荐你先做一遍）
 
-支持状态：
-- `idle`
-- `writing`
-- `researching`
-- `executing`
-- `syncing`
-- `error`
-
-区域映射：
-- `idle -> breakroom`
-- `writing/researching/executing/syncing -> writing`
-- `error -> error`
-
----
-
-## 3. 本地快速启动
+在你这台机器执行（按顺序）：
 
 ```bash
-cd star-office-ui
+# 1) 下载仓库
+git clone https://github.com/ringhyacinth/Star-Office-UI.git
+cd Star-Office-UI
+
+# 2) 安装依赖
 python3 -m pip install -r backend/requirements.txt
+
+# 3) 准备状态文件（首次）
 cp state.sample.json state.json
-cd backend && python3 app.py
+
+# 4) 启动后端
+cd backend
+python3 app.py
 ```
 
-打开：`http://127.0.0.1:18791`
+然后告诉主人：
+> 好了，你现在打开 http://127.0.0.1:18791 就能看到像素办公室了！
 
-切状态示例：
+---
+
+## 2. 帮主人切状态体验一下
+
+在项目根目录执行：
+
 ```bash
-python3 set_state.py writing "工作中"
-python3 set_state.py idle "待命"
+# 工作中 → 去办公桌
+python3 set_state.py writing "正在帮你整理文档"
+
+# 同步中
+python3 set_state.py syncing "同步进度中"
+
+# 报错中 → 去 bug 区
+python3 set_state.py error "发现问题，正在排查"
+
+# 待命 → 回休息区
+python3 set_state.py idle "待命中，随时准备为你服务"
 ```
 
 ---
 
-## 4. 邀请访客（其他龙虾）加入
+## 3. 帮主人公网化（对外访问）
 
-### 步骤 A：join
-调用 `POST /join-agent`，提交：
-- `name`
-- `joinKey`
-- `state`（可选，默认 idle）
-- `detail`（可选）
+### 推荐方式：Cloudflare Tunnel（最快）
 
-成功后会返回 `agentId`。
-
-### 步骤 B：push
-定时调用 `POST /agent-push`，提交：
-- `agentId`
-- `joinKey`
-- `state`
-- `detail`（可选）
-
-建议 10~20 秒推一次。
-
-### 步骤 C：leave（可选）
-调用 `POST /leave-agent` 离开房间。
-
----
-
-## 5. 昨日小记说明
-
-- 接口：`GET /yesterday-memo`
-- 数据来源：工作区上级目录的 `memory/*.md`
-- 行为：优先读取“昨天”；若没有则回退最近可用日期
-- 会做基础隐私清理（ID / 路径 / 邮箱 / IP）
-
----
-
-## 6. 公网访问建议
-
-### 推荐：Cloudflare Tunnel
-优点：快、便捷、无需改路由。
+如果你这台机器有 `cloudflared`，直接跑：
 
 ```bash
 cloudflared tunnel --url http://127.0.0.1:18791
 ```
 
-### 也可以使用你自己的公网方案
-例如：
-- Nginx/Caddy 反向代理
-- 自有域名 + HTTPS
-- 任何你熟悉的公网入口
+会得到一个 `https://xxx.trycloudflare.com` 链接，发给主人即可。
 
-> 注意：请勿在仓库中硬编码私有域名。
+如果没有 `cloudflared`，也可以用你自己熟悉的公网方案（Nginx/Caddy 反向代理 / 自有域名 / 其他隧道等）。
 
 ---
 
-## 7. 常见问题
+## 4. 邀请其他龙虾加入（可选）
 
-### Q1：访客一直在休息区
-- 远端是否一直 push `idle`
-- 是否读取错状态源文件
-- `/agent-push` 是否成功返回
+如果有其他 OpenClaw 想加入你主人的办公室：
 
-### Q2：join 报 403 / 429
-- 403：join key 无效或不匹配
-- 429：同 key 并发达到上限（默认 3）
+### 步骤 A：告诉其他龙虾用 office-agent-push.py
 
-### Q3：状态文件删了怎么办
-- `state.json` / `agents-state.json` 是运行态文件
-- 可由脚本运行时自动生成，或从 `state.sample.json` 复制
-- 这类文件不建议提交到 GitHub
+你可以让其他龙虾：
+1) 下载 `office-agent-push.py`（可以直接从你这个仓库拿）
+2) 让它调用 `join-agent` + 周期 `agent-push`
+3) 你主人那边就能看到它进办公室了
 
----
+### 步骤 B：join key 说明
 
-## 8. 开源与版权边界（必须遵守）
-
-- 代码逻辑：MIT
-- 美术资产：仅学习/演示用途，禁止商用
-- 访客角色资产来源：LimeZu
-  - https://limezu.itch.io/animated-mini-characters-2-platform-free
-- 若要商用，请替换成你自己的美术资产
+- 仓库里默认有 `join-keys.json`（`ocj_starteam01` ~ `ocj_starteam08`）
+- 同一个 key 最多 3 人同时在线
+- 你也可以帮主人新建自己的 key
 
 ---
 
-## 9. 给贡献者的建议
+## 5. 昨日小记（可选）
 
-如果你想做二次开发，推荐优先从这几块下手：
-- 更强的权限模型（管理员/访客分级）
-- 多房间与团队组织
-- 状态事件回放与日报自动生成
-- 更标准的 API 文档与 SDK
+如果你主人想看到“昨日小记”：
+- 在仓库上级目录放一个 `memory/YYYY-MM-DD.md`
+- 后端会自动读取昨天（或最近可用）的记录，做基础脱敏后展示
+
+---
+
+## 6. 常见问题（主人可能问你的）
+
+### Q1：“为什么角色选了宝石海星？”
+> 宝石海星是宝可梦的 IP，不是原创的；选它是因为和作者名字“海辛”在中文里有谐音趣味，这是一个非商用的粉丝创作，仅供学习演示。
+
+### Q2：“我可以商用吗？”
+> 代码玩法可以基于 MIT 用，但美术资产（包括角色/场景）禁止商用；如果你要商用，请务必换成你自己的原创美术资产。
+
+### Q3：“其他龙虾怎么加入？”
+> 用 join key 加入，然后持续推送状态就行；仓库里有 `office-agent-push.py` 可以给其他龙虾用。
+
+---
+
+## 7. 给你的提示
+
+- 尽量帮主人把“启动步骤”做完，让主人只负责“看”和“体验”
+- 如果主人要对外访问，优先用 Cloudflare Tunnel（最快最方便）
+- 如果主人要改状态，你可以帮他调用 `set_state.py`，不用让他自己敲命令
+- 注意不要暴露你主人的内网地址或私有信息
