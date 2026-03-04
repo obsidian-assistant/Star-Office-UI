@@ -2,6 +2,7 @@
 """Star Office UI - Backend State Service"""
 
 from flask import Flask, jsonify, send_from_directory, make_response, request, session
+from werkzeug.exceptions import RequestEntityTooLarge
 from datetime import datetime, timedelta
 import json
 import os
@@ -12,6 +13,7 @@ import shutil
 import subprocess
 import tempfile
 import threading
+import time
 from pathlib import Path
 from security_utils import (
     is_production_mode,
@@ -105,6 +107,23 @@ PROTECTED_WRITE_PATHS = {
     "/agent-reject",
 }
 
+# Upload hardening (non-breaking default; affects only oversized uploads)
+MAX_UPLOAD_MB = int(os.getenv("STAR_OFFICE_MAX_UPLOAD_MB", "20"))
+MAX_UPLOAD_BYTES = max(1, MAX_UPLOAD_MB) * 1024 * 1024
+app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
+
+# Basic in-process rate limiter for sensitive write endpoints
+# Format: STAR_OFFICE_WRITE_RATE_LIMIT="60,60" => 60 requests / 60 seconds per IP+path
+_rate_limit_raw = (os.getenv("STAR_OFFICE_WRITE_RATE_LIMIT") or "60,60").strip()
+try:
+    _limit_count, _limit_window = [int(x.strip()) for x in _rate_limit_raw.split(",", 1)]
+except Exception:
+    _limit_count, _limit_window = 60, 60
+WRITE_RATE_LIMIT_COUNT = max(1, _limit_count)
+WRITE_RATE_LIMIT_WINDOW_SECONDS = max(1, _limit_window)
+_rate_buckets = {}
+_rate_lock = threading.Lock()
+
 if is_production_mode():
     hardening_errors = []
     if not is_strong_secret(str(app.secret_key)):
@@ -142,15 +161,61 @@ def _write_api_auth_ok() -> bool:
     return is_valid_bearer(token, WRITE_API_TOKENS)
 
 
+def _client_ip() -> str:
+    # Prefer reverse-proxy headers when present.
+    xff = (request.headers.get("X-Forwarded-For") or "").strip()
+    if xff:
+        return xff.split(",")[0].strip()
+    xrip = (request.headers.get("X-Real-IP") or "").strip()
+    if xrip:
+        return xrip
+    return (request.remote_addr or "unknown").strip() or "unknown"
+
+
+def _check_rate_limit(path: str) -> tuple[bool, int]:
+    now = int(time.time())
+    key = f"{_client_ip()}::{path}"
+    with _rate_lock:
+        item = _rate_buckets.get(key)
+        if not item or now >= item["reset_at"]:
+            _rate_buckets[key] = {"count": 1, "reset_at": now + WRITE_RATE_LIMIT_WINDOW_SECONDS}
+            return True, WRITE_RATE_LIMIT_WINDOW_SECONDS
+
+        if item["count"] >= WRITE_RATE_LIMIT_COUNT:
+            retry_after = max(1, item["reset_at"] - now)
+            return False, retry_after
+
+        item["count"] += 1
+        retry_after = max(1, item["reset_at"] - now)
+        return True, retry_after
+
+
 @app.before_request
 def enforce_write_api_auth_if_enabled():
     if request.method != "POST":
         return None
     if request.path not in PROTECTED_WRITE_PATHS:
         return None
+
+    allowed, retry_after = _check_rate_limit(request.path)
+    if not allowed:
+        resp = jsonify({"ok": False, "code": "RATE_LIMITED", "msg": "Too many requests"})
+        resp.status_code = 429
+        resp.headers["Retry-After"] = str(retry_after)
+        return resp
+
     if _write_api_auth_ok():
         return None
     return jsonify({"ok": False, "code": "UNAUTHORIZED", "msg": "Write API auth required"}), 401
+
+
+@app.errorhandler(RequestEntityTooLarge)
+def handle_request_too_large(_e):
+    return jsonify({
+        "ok": False,
+        "code": "PAYLOAD_TOO_LARGE",
+        "msg": f"Upload exceeds limit ({MAX_UPLOAD_MB}MB)",
+    }), 413
 
 
 @app.after_request

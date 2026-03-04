@@ -83,6 +83,8 @@ def main() -> int:
     drawer_pass = os.getenv("ASSET_DRAWER_PASS") or ""
     write_api_guard_enabled = (os.getenv("STAR_OFFICE_WRITE_API_BEARER_ENABLED") or "").strip().lower() in {"1", "true", "yes", "on"}
     write_api_tokens = (os.getenv("STAR_OFFICE_WRITE_API_TOKENS") or "").strip()
+    max_upload_mb_raw = (os.getenv("STAR_OFFICE_MAX_UPLOAD_MB") or "20").strip()
+    write_rl_raw = (os.getenv("STAR_OFFICE_WRITE_RATE_LIMIT") or "60,60").strip()
 
     if in_prod:
         if not is_strong_secret(secret):
@@ -100,6 +102,22 @@ def main() -> int:
             warnings.append("ASSET_DRAWER_PASS not set (defaults may be unsafe for public exposure)")
         if write_api_guard_enabled and not write_api_tokens:
             failures.append("Write API bearer guard enabled but STAR_OFFICE_WRITE_API_TOKENS is empty")
+
+    try:
+        max_upload_mb = int(max_upload_mb_raw)
+        if max_upload_mb < 1:
+            failures.append("STAR_OFFICE_MAX_UPLOAD_MB must be >= 1")
+        elif max_upload_mb > 200:
+            warnings.append("STAR_OFFICE_MAX_UPLOAD_MB is very high (>200MB), consider lowering for DoS safety")
+    except Exception:
+        failures.append("STAR_OFFICE_MAX_UPLOAD_MB is invalid (must be integer)")
+
+    try:
+        a, b = [int(x.strip()) for x in write_rl_raw.split(",", 1)]
+        if a < 1 or b < 1:
+            failures.append("STAR_OFFICE_WRITE_RATE_LIMIT must be positive integers, e.g. 60,60")
+    except Exception:
+        failures.append("STAR_OFFICE_WRITE_RATE_LIMIT format invalid, expected <count>,<window_seconds> like 60,60")
 
     tracked = tracked_files()
     risky_tracked = [
