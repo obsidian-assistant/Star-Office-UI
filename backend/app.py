@@ -13,7 +13,14 @@ import subprocess
 import tempfile
 import threading
 from pathlib import Path
-from security_utils import is_production_mode, is_strong_secret, is_strong_drawer_pass
+from security_utils import (
+    is_production_mode,
+    is_strong_secret,
+    is_strong_drawer_pass,
+    parse_csv_set,
+    feature_enabled,
+    is_valid_bearer,
+)
 from memo_utils import get_yesterday_date_str, sanitize_content, extract_memo_from_file
 from store_utils import (
     load_agents_state as _store_load_agents_state,
@@ -83,6 +90,19 @@ join_lock = threading.Lock()
 VERSION_TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M%S")
 ASSET_DRAWER_PASS_DEFAULT = os.getenv("ASSET_DRAWER_PASS", "1234")
 
+# Phase 2 hardening (non-breaking): optional write-endpoint bearer guard.
+# Default OFF to avoid changing existing behavior before explicit enable.
+WRITE_API_BEARER_ENABLED = feature_enabled("STAR_OFFICE_WRITE_API_BEARER_ENABLED", default=False)
+WRITE_API_TOKENS = parse_csv_set(os.getenv("STAR_OFFICE_WRITE_API_TOKENS", ""))
+PROTECTED_WRITE_PATHS = {
+    "/set_state",
+    "/join-agent",
+    "/leave-agent",
+    "/agent-push",
+    "/agent-approve",
+    "/agent-reject",
+}
+
 if is_production_mode():
     hardening_errors = []
     if not is_strong_secret(str(app.secret_key)):
@@ -101,6 +121,34 @@ def _require_asset_editor_auth():
     if _is_asset_editor_authed():
         return None
     return jsonify({"ok": False, "code": "UNAUTHORIZED", "msg": "Asset editor auth required"}), 401
+
+
+def _extract_bearer_token() -> str:
+    h = (request.headers.get("Authorization") or "").strip()
+    if not h.lower().startswith("bearer "):
+        return ""
+    return h[7:].strip()
+
+
+def _write_api_auth_ok() -> bool:
+    if not WRITE_API_BEARER_ENABLED:
+        return True
+    # Misconfiguration safety: enabled but no token configured -> reject all writes.
+    if not WRITE_API_TOKENS:
+        return False
+    token = _extract_bearer_token()
+    return is_valid_bearer(token, WRITE_API_TOKENS)
+
+
+@app.before_request
+def enforce_write_api_auth_if_enabled():
+    if request.method != "POST":
+        return None
+    if request.path not in PROTECTED_WRITE_PATHS:
+        return None
+    if _write_api_auth_ok():
+        return None
+    return jsonify({"ok": False, "code": "UNAUTHORIZED", "msg": "Write API auth required"}), 401
 
 
 @app.after_request

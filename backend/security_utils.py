@@ -6,6 +6,7 @@ P1 step: extraction without behavior change.
 
 from __future__ import annotations
 
+import hmac
 import os
 
 
@@ -32,3 +33,26 @@ def is_strong_drawer_pass(pwd: str) -> bool:
     if pwd == "1234":
         return False
     return len(pwd) >= 8
+
+
+def parse_csv_set(value: str | None) -> set[str]:
+    if not value:
+        return set()
+    return {x.strip() for x in str(value).split(",") if x and x.strip()}
+
+
+def feature_enabled(name: str, default: bool = False) -> bool:
+    v = os.getenv(name)
+    if v is None:
+        return default
+    return str(v).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def is_valid_bearer(token: str, accepted_tokens: set[str]) -> bool:
+    t = (token or "").strip()
+    if not t or not accepted_tokens:
+        return False
+    for at in accepted_tokens:
+        if hmac.compare_digest(t, at):
+            return True
+    return False

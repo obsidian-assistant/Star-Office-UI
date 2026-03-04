@@ -81,17 +81,25 @@ def main() -> int:
 
     secret = os.getenv("FLASK_SECRET_KEY") or os.getenv("STAR_OFFICE_SECRET") or ""
     drawer_pass = os.getenv("ASSET_DRAWER_PASS") or ""
+    write_api_guard_enabled = (os.getenv("STAR_OFFICE_WRITE_API_BEARER_ENABLED") or "").strip().lower() in {"1", "true", "yes", "on"}
+    write_api_tokens = (os.getenv("STAR_OFFICE_WRITE_API_TOKENS") or "").strip()
 
     if in_prod:
         if not is_strong_secret(secret):
             failures.append("Weak/missing FLASK_SECRET_KEY (or STAR_OFFICE_SECRET) in production")
         if not is_strong_pass(drawer_pass):
             failures.append("Weak/missing ASSET_DRAWER_PASS in production")
+        if not write_api_guard_enabled:
+            warnings.append("STAR_OFFICE_WRITE_API_BEARER_ENABLED is OFF in production (write endpoints are publicly callable)")
+        elif not write_api_tokens:
+            failures.append("STAR_OFFICE_WRITE_API_BEARER_ENABLED is ON but STAR_OFFICE_WRITE_API_TOKENS is empty")
     else:
         if not secret:
             warnings.append("FLASK_SECRET_KEY not set (ok for local dev, not for production)")
         if not drawer_pass:
             warnings.append("ASSET_DRAWER_PASS not set (defaults may be unsafe for public exposure)")
+        if write_api_guard_enabled and not write_api_tokens:
+            failures.append("Write API bearer guard enabled but STAR_OFFICE_WRITE_API_TOKENS is empty")
 
     tracked = tracked_files()
     risky_tracked = [
