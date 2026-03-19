@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Star 的像素办公室</title>
+    <title>Atlas 的像素办公室</title>
     <style>
         @font-face {
             font-family: 'ArkPixel';
@@ -643,7 +643,7 @@
             background: #4a4f5f;
             border-color: #e94560;
         }
-        /* Star 状态四按钮（不含装修）使用像素精灵皮肤 */
+        /* Atlas 状态四按钮（不含装修）使用像素精灵皮肤 */
         #control-bar #btn-state-idle,
         #control-bar #btn-state-writing,
         #control-bar #btn-state-syncing,
@@ -1133,7 +1133,7 @@
 <body>
     <!-- 加载遮罩 -->
     <div id="loading-overlay">
-        <div id="loading-text">Loading Star’s pixel office...</div>
+        <div id="loading-text">Loading Atlas’s pixel office...</div>
         <div id="loading-progress-container">
             <div id="loading-progress-bar"></div>
         </div>
@@ -1160,7 +1160,7 @@
         
         <!-- 状态控制栏 -->
         <div id="control-bar">
-            <div id="control-bar-title">Star 状态</div>
+            <div id="control-bar-title">Atlas 状态</div>
             <div id="control-buttons">
                 <button id="btn-state-idle" onclick="setState('idle','待命')">待命</button>
                 <button id="btn-state-writing" onclick="setState('writing','工作中')">工作</button>
@@ -1293,7 +1293,7 @@
         let uiLang = localStorage.getItem('uiLang') || 'en';
         const I18N = {
             zh: {
-                controlTitle: 'Star 状态',
+                controlTitle: 'Atlas 状态',
                 btnIdle: '待命', btnWork: '工作', btnSync: '同步', btnError: '报警', btnDecor: '装修房间',
                 drawerTitle: '装修房间 · 资产侧边栏', drawerClose: '关闭',
                 authTitle: '请输入装修验证码', authPlaceholder: '输入验证码', authVerify: '验证', authDefaultPassHint: '默认密码：1234（可随时让我帮你改，建议改成强密码）',
@@ -1318,10 +1318,10 @@
                 assetHintDefault: '通用素材：建议保持原图尺寸、透明通道与视觉重心一致，避免错位或失真',
                 showCoords: '显示坐标', hideCoords: '隐藏坐标', moveView: '移动视野', lockView: '锁定视野',
                 memoTitle: '昨 日 小 记', guestTitle: '访 客 列 表', officeTitle: '海辛小龙虾的办公室',
-                loadingOffice: '正在加载 Star 的像素办公室...'
+                loadingOffice: '正在加载 Atlas 的像素办公室...'
             },
             en: {
-                controlTitle: 'Star Status',
+                controlTitle: 'Atlas Status',
                 btnIdle: 'Idle', btnWork: 'Work', btnSync: 'Sync', btnError: 'Alert', btnDecor: 'Decorate Room',
                 drawerTitle: 'Decorate Room · Asset Sidebar', drawerClose: 'Close',
                 authTitle: 'Enter Decor Passcode', authPlaceholder: 'Enter passcode', authVerify: 'Verify', authDefaultPassHint: 'Default passcode: 1234 (ask me anytime to change it; stronger passcode recommended)',
@@ -1346,10 +1346,10 @@
                 assetHintDefault: 'Generic asset: keep source size, alpha channel, and visual anchor to avoid drift/distortion',
                 showCoords: 'Show Coords', hideCoords: 'Hide Coords', moveView: 'Pan View', lockView: 'Lock View',
                 memoTitle: 'YESTERDAY NOTES', guestTitle: 'VISITOR LIST', officeTitle: 'Haixin Lobster Office',
-                loadingOffice: 'Loading Star’s pixel office...'
+                loadingOffice: 'Loading Atlas’s pixel office...'
             },
             ja: {
-                controlTitle: 'Star ステータス',
+                controlTitle: 'Atlas ステータス',
                 btnIdle: '待機', btnWork: '作業', btnSync: '同期', btnError: '警報', btnDecor: '部屋を編集',
                 drawerTitle: '部屋編集・アセットサイドバー', drawerClose: '閉じる',
                 authTitle: '編集パスコードを入力', authPlaceholder: 'パスコード入力', authVerify: '認証', authDefaultPassHint: '初期パスコード：1234（いつでも変更を相談可。強固なパス推奨）',
@@ -1374,7 +1374,7 @@
                 assetHintDefault: '汎用素材：元サイズ・透過・視覚アンカーを維持し、ズレや崩れを防いでください',
                 showCoords: '座標表示', hideCoords: '座標非表示', moveView: '視点移動', lockView: '視点固定',
                 memoTitle: '昨日のメモ', guestTitle: '訪問者リスト', officeTitle: 'ハイシン・ロブスターのオフィス',
-                loadingOffice: 'Star のピクセルオフィスを読み込み中...'
+                loadingOffice: 'Atlas のピクセルオフィスを読み込み中...'
             }
         };
 

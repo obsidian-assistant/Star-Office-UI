@@ -1,0 +1,40 @@
+{
+  "main": {
+    "agentId": "atlas",
+    "name": "Atlas",
+    "state": "idle",
+    "detail": "En Mission Control, esperando la siguiente orden"
+  },
+  "agents": [
+    {
+      "agentId": "health-hub",
+      "name": "Health Hub",
+      "state": "idle",
+      "detail": "Seguimiento de salud y métricas"
+    },
+    {
+      "agentId": "investment-hub",
+      "name": "Investment Hub",
+      "state": "idle",
+      "detail": "Vigilando inversiones y cartera"
+    },
+    {
+      "agentId": "inmobiliaria-core",
+      "name": "Inmobiliaria Core",
+      "state": "idle",
+      "detail": "Procesando operaciones inmobiliarias"
+    },
+    {
+      "agentId": "web-content-factory",
+      "name": "Web Content Factory",
+      "state": "idle",
+      "detail": "Generando y ordenando contenido web"
+    },
+    {
+      "agentId": "mission-control",
+      "name": "Mission Control",
+      "state": "syncing",
+      "detail": "Orquestando servicios y paneles"
+    }
+  ]
+}
