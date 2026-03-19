@@ -100,12 +100,12 @@ function hideLoadingOverlay() {
 }
 
 const STATES = {
-  idle: { name: '待命', area: 'breakroom' },
-  writing: { name: '整理文档', area: 'writing' },
-  researching: { name: '搜索信息', area: 'researching' },
-  executing: { name: '执行任务', area: 'writing' },
-  syncing: { name: '同步备份', area: 'writing' },
-  error: { name: '出错了', area: 'error' }
+  idle: { name: 'Idle', area: 'breakroom' },
+  writing: { name: 'Writing', area: 'writing' },
+  researching: { name: 'Researching', area: 'researching' },
+  executing: { name: 'Executing', area: 'writing' },
+  syncing: { name: 'Syncing', area: 'writing' },
+  error: { name: 'Error', area: 'error' }
 };
 
 const BUBBLE_TEXTS = {

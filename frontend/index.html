@@ -1149,7 +1149,7 @@
     <div id="bottom-panels">
         <!-- Memo 面板 -->
         <div id="memo-panel">
-            <div id="memo-title">昨 日 小 记</div>
+            <div id="memo-title">YESTERDAY NOTES</div>
             <div id="memo-date"></div>
             <div class="memo-decoration">─ ─ ─ ─ ─</div>
             <div id="memo-content">
@@ -1162,7 +1162,7 @@
         <div id="control-bar">
             <div id="control-bar-title">Atlas 状态</div>
             <div id="control-buttons">
-                <button id="btn-state-idle" onclick="setState('idle','待命')">待命</button>
+                <button id="btn-state-idle" onclick="setState('idle','Idle')">Idle</button>
                 <button id="btn-state-writing" onclick="setState('writing','工作中')">工作</button>
                 <button id="btn-state-syncing" onclick="setState('syncing','同步中')">同步</button>
                 <button id="btn-state-error" onclick="setState('error','报警中')">报警</button>
@@ -1172,7 +1172,7 @@
 
         <!-- Guest Agent 名单面板（右下角） -->
         <div id="guest-agent-panel">
-            <div id="guest-agent-panel-title">访 客 列 表</div>
+            <div id="guest-agent-panel-title">VISITOR LIST</div>
             <div id="guest-agent-list">
                 <div style="color:#9ca3af;font-size:12px;text-align:center;padding:20px 0;">正在加载访客...</div>
             </div>
@@ -1345,7 +1345,7 @@
                 assetHintNotInScene: 'This object is not detected in current scene; you can still replace file (effective after refresh)',
                 assetHintDefault: 'Generic asset: keep source size, alpha channel, and visual anchor to avoid drift/distortion',
                 showCoords: 'Show Coords', hideCoords: 'Hide Coords', moveView: 'Pan View', lockView: 'Lock View',
-                memoTitle: 'YESTERDAY NOTES', guestTitle: 'VISITOR LIST', officeTitle: 'Haixin Lobster Office',
+                memoTitle: 'YESTERDAY NOTES', guestTitle: 'VISITOR LIST', officeTitle: 'Atlas Office',
                 loadingOffice: 'Loading Atlas’s pixel office...'
             },
             ja: {
@@ -1613,12 +1613,12 @@
         // 懒加载逻辑已取消（体验优先：装饰首屏直接出现）
 
         const STATES = {
-            idle: { name: '待命', area: 'breakroom' },
-            writing: { name: '整理文档', area: 'writing' },
-            researching: { name: '搜索信息', area: 'researching' },
-            executing: { name: '执行任务', area: 'writing' },
-            syncing: { name: '同步备份', area: 'writing' },
-            error: { name: '出错了', area: 'error' }
+            idle: { name: 'Idle', area: 'breakroom' },
+            writing: { name: 'Writing', area: 'writing' },
+            researching: { name: 'Researching', area: 'researching' },
+            executing: { name: 'Executing', area: 'writing' },
+            syncing: { name: 'Syncing', area: 'writing' },
+            error: { name: 'Error', area: 'error' }
         };
 
         const BUBBLE_TEXTS = {
@@ -3690,7 +3690,7 @@ function toggleBrokerPanel() {
                 writing: ['我在工作区处理任务', '正在整理文档与执行中', '工作区专注推进中'],
                 researching: ['我在调研模式，搜集信息', '正在查资料和验证线索', '研究中，稍后同步结论'],
                 executing: ['执行中，正在跑流程', '我在工作区推进任务', '正在把计划落地执行'],
-                syncing: ['同步中，马上更新状态', '正在同步进度到系统', '数据同步中请稍候'],
+                syncing: ['Syncing now, status update incoming', 'Pushing progress into the system', 'Data sync in progress, please wait'],
                 error: ['我在 bug 区排查问题', '检测到异常，正在修复', '报警中，先定位再处理']
             };
             const agentState = (guestAgents.find(a => a.agentId === id) || {}).state || 'idle';
