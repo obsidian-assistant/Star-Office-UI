@@ -41,7 +41,7 @@ def main():
         "detail": main_cfg.get("detail", "Waiting..."),
         "progress": 0,
         "updated_at": now,
-        "officeName": "Oficina de Atlas",
+        "officeName": "Juan's Lobster Office",
     }
     STATE_PATH.write_text(json.dumps(main_state, ensure_ascii=False, indent=2), encoding="utf-8")
 

@@ -30,7 +30,7 @@ def main():
     main = data.get('main', {})
     mc_up = up('http://127.0.0.1:3002/')
     main['state'] = 'syncing' if mc_up else 'error'
-    main['detail'] = 'Coordinando Mission Control y la oficina' if mc_up else 'Mission Control no responde'
+    main['detail'] = "Coordinating Mission Control and the office" if mc_up else "Mission Control is not responding"
     data['main'] = main
 
     for agent in data.get('agents', []):

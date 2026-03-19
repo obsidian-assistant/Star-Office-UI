@@ -82,7 +82,7 @@ function updateLoadingProgress() {
     loadingProgressBar.style.width = percent + '%';
   }
   if (loadingText) {
-    loadingText.textContent = `正在加载 Atlas 的像素办公室... ${percent}%`;
+    loadingText.textContent = `Loading Juan's Lobster Office... ${percent}%`;
   }
 }
 
@@ -374,7 +374,7 @@ function create() {
   const plaqueY = LAYOUT.plaque.y;
   const plaqueBg = game.add.rectangle(plaqueX, plaqueY, LAYOUT.plaque.width, LAYOUT.plaque.height, 0x5d4037);
   plaqueBg.setStrokeStyle(3, 0x3e2723);
-  const plaqueText = game.add.text(plaqueX, plaqueY, '海辛小龙虾的办公室', {
+  const plaqueText = game.add.text(plaqueX, plaqueY, 'Juan's Lobster Office', {
     fontFamily: 'ArkPixel, monospace',
     fontSize: '18px',
     fill: '#ffd700',
